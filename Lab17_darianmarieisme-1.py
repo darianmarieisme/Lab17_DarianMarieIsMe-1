@@ -11,11 +11,11 @@ import requests
 def get_top_story_ids() -> list[int]:
     '''get the the ids for the current top stories on hacker news
     '''
-    url: str = "https://hacker-news.firebaseio.com/v0/topstories.json"
+    url = "https://hacker-news.firebaseio.com/v0/topstories.json"
     r = requests.get(url)
     print(f"Status code: {r.status_code}")
 
-    return response.json()
+    return r.json()
 
 def get_submission_dict(submission_id: int) -> dict[str, str | int]:
     '''Build and return a dictionary containing data for one Hacker 
@@ -53,7 +53,26 @@ def get_submission_dicts(submission_ids: list[int]) -> list[dict[str, str | int]
 
     return submission_dicts
 
-for submission_dict in submission_dicts:
-    print(f"\nTitle: {submission_dict['title']}")
-    print(f"Discussion link: {submission_dict['hn_link']}")
-    print(f"Comments: {submission_dict['comments']}")
+def print_submissions(submission_dicts: list[dict[str, str | int]]) -> None:
+    '''Print each article's title, discussion link, and number of comments'''
+    
+    for submission_dict in submission_dicts:
+        print(f"\nTitle: {submission_dict['title']}")
+        print(f"Discussion link: {submission_dict['hn_link']}")
+        print(f"Comments: {submission_dict['comments']}")
+
+def main() -> None:
+    '''Get, sort, and print the top Hacker News submissions.'''
+
+    submission_ids = get_top_story_ids()
+    submission_dicts = get_submission_dicts(submission_ids)
+
+    submission_dicts = sorted(
+        submission_dicts,
+        key = itemgetter("comments"),
+        reverse = True
+    )
+
+    print_submissions(submission_dicts)
+
+main()
